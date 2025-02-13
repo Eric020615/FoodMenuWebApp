@@ -15,10 +15,17 @@ namespace FoodMenuWebApp.Controllers
         }
 
         // be default the route endpoint is /Menu/Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var dishes = await _context.Dishes.ToListAsync<Dish>();
-            return View(dishes);
+            var dishes = from d in _context.Dishes
+                       select d;
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                dishes = dishes.Where(d => d.Name.Contains(searchString));
+                return View(await dishes.ToListAsync());
+            }
+            //var dishes = await _context.Dishes.ToListAsync<Dish>();
+            return View(await dishes.ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
