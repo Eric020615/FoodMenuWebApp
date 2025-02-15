@@ -1,5 +1,4 @@
 ﻿using FoodMenuWebApp.Data;
-using FoodMenuWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,11 +13,13 @@ namespace FoodMenuWebApp.Controllers
             _context = context;
         }
 
-        // be default the route endpoint is /Menu/Index
+        // The Index method handles the route: /Menu/Index
+        // - The "searchString" parameter is NOT part of the route template.
+        // - ASP.NET Core automatically treats it as a query parameter.
+        // - Example URL: /Menu/Index?searchString=pizza
         public async Task<IActionResult> Index(string searchString)
         {
-            var dishes = from d in _context.Dishes
-                       select d;
+            var dishes = from d in _context.Dishes select d;
             if (!string.IsNullOrEmpty(searchString))
             {
                 dishes = dishes.Where(d => d.Name.Contains(searchString));
@@ -28,6 +29,10 @@ namespace FoodMenuWebApp.Controllers
             return View(await dishes.ToListAsync());
         }
 
+        // The Details method handles the route: /Menu/Details/{id}
+        // - By default, ASP.NET Core follows the route pattern: {controller}/{action}/{id?}
+        // - Since "id" matches this pattern, ASP.NET Core treats it as a path variable instead of a query parameter.
+        // - Example URL: /Menu/Details/5 (id is passed as a route parameter)
         public async Task<IActionResult> Details(int? id)
         {
             var dish = await _context.Dishes
